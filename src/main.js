@@ -106,8 +106,6 @@ import TriStateCheckbox from 'primevue/tristatecheckbox';
 import VirtualScroller from 'primevue/virtualscroller';
 import Tailwind from 'primevue/passthrough/tailwind';
 
-import apiroutes from '@/plugins/apiroutes'
-
 import { createPinia } from "pinia";
 
 const app = createApp(App).use(createPinia())
@@ -117,8 +115,6 @@ app.use(PrimeVue, { ripple: true});
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
-
-app.use(apiroutes);
 
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);

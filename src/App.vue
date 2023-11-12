@@ -1,18 +1,26 @@
 <template>
   <div class="p-2 sm:p-6">
     <div class="h-screen w-screen">
-      <SelectDifficulty v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" />
-      <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="mt-6">
-        <SelectCategories />
+      <div>
+        <SelectDifficulty v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" />
+        <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="mt-6">
+          <SelectCategories />
+        </div>
+        <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED' && quizStore.selectedCategory" class="mt-6">
+          <SelectQuiz />
+        </div>
+        <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="text-center mt-6">
+          <Button @click="startQuiz" raised text label="Start!"></Button>
+        </div>
+        <div v-if="quizStore.quizStatus === 'STARTED' || quizStore.quizStatus === 'FINISHED'" class="mt-6">
+          <Quiz />
+        </div>
       </div>
-      <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED' && quizStore.selectedCategory" class="mt-6">
-        <SelectQuiz />
-      </div>
-      <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="text-center mt-6">
-        <Button @click="startQuiz" raised text label="Start!"></Button>
-      </div>
-      <div v-if="quizStore.quizStatus === 'STARTED' || quizStore.quizStatus === 'FINISHED'" class="mt-6">
-        <Quiz />
+
+      <div>
+        <div class="py-6 class w-full mx-auto">
+          <CreateQuiz/>
+        </div>
       </div>
     </div>
 
@@ -33,6 +41,7 @@ import QuizApi from "@/api/quiz";
 const quizApi = new QuizApi();
 
 import { useQuiz } from "@/store/modules/quiz";
+import CreateQuiz from "./components/CreateQuiz.vue";
 
 const quizStore = useQuiz();
 

@@ -5,6 +5,7 @@ export const useQuiz = defineStore("quiz", {
   state: () => {
     return {
       categories: [],
+      difficultyLevels: [],
       selectedCategory: null,
       selectedQuiz: null,
       quizStatus: null,
@@ -25,6 +26,9 @@ export const useQuiz = defineStore("quiz", {
     },
     setCategories(categories) {
       this.categories = categories;
+    },
+    setDifficultyLevels(difficultyLevels) {
+      this.difficultyLevels = difficultyLevels;
     },
     setCategory(category) {
       this.selectedCategory = category;

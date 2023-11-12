@@ -17,6 +17,8 @@ const state = reactive({
     difficulties: ["Easy", "Medium", "Hard"],
 });
 
+quizStore.setDifficultyLevels(state.difficulties)
+
 const selectDifficulty = (difficulty) => {
   quizStore.setDifficulty(difficulty);
 };
