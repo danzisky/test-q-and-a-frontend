@@ -22,7 +22,9 @@ const state = reactive({
 });
 
 const quizzesByCategory = computed(() => {
-  return quizStore.quizzes.filter(q => q.category?.id == props.categoryId).map(q => q.title)
+  return quizStore.quizzes.filter((q) =>{
+    return (q.category?.id == props.categoryId) && (quizStore.selectedDifficulty ? q?.difficulty === quizStore.selectedDifficulty : true)
+  }).map(q => q.title)
 })
 
 watch(

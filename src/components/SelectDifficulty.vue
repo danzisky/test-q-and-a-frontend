@@ -1,8 +1,8 @@
 <template>
   <div class="mb-2 text-center text-2xl">Difficulty</div>
   <div class="grid text-center">
-    <div class="col" v-for="difficulty in state.difficulties">
-      <Button text raised rounded class="large" severity="info" @click="selectDifficulty(difficulty)" :label="difficulty" />
+    <div class="col" v-for="difficulty in state.difficulties" :key="difficulty">
+      <Button  :icon="difficulty == quizStore.selectedDifficulty ? 'pi pi-check' : ''"  text raised rounded class="large" severity="info" @click="selectDifficulty(difficulty)" :label="difficulty" />
     </div>
   </div>
 </template>
@@ -20,6 +20,10 @@ const state = reactive({
 quizStore.setDifficultyLevels(state.difficulties)
 
 const selectDifficulty = (difficulty) => {
-  quizStore.setDifficulty(difficulty);
+  if(quizStore.selectedDifficulty === difficulty) {
+    quizStore.setDifficulty(null);
+  } else {
+    quizStore.setDifficulty(difficulty);
+  }
 };
 </script>

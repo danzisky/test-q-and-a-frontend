@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full margin-auto">
     <form @submit.prevent="createQuiz">
         <div class="flex flex-column gap-4 w-max">
             <div :class="inputGroupClass">
