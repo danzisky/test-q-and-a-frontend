@@ -1,13 +1,14 @@
 <template>
   <div class="p-2 sm:p-6">
+    <Toast/>
     <div class="h-screen w-screen">
       <div>
         <SelectDifficulty v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" />
         <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="mt-6">
-          <SelectCategories />
+          <SelectCategories/>
         </div>
         <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED' && quizStore.selectedCategory" class="mt-6">
-          <SelectQuiz />
+          <SelectQuiz :category-id="selectedCategoryId" />
         </div>
         <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="text-center mt-6">
           <Button @click="startQuiz" raised text label="Start!"></Button>
@@ -32,7 +33,7 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import SelectCategories from "@/components/SelectCategories.vue";
 import SelectDifficulty from "@/components/SelectDifficulty.vue";
 import SelectQuiz from "./components/SelectQuiz.vue";
@@ -42,6 +43,10 @@ const quizApi = new QuizApi();
 
 import { useQuiz } from "@/store/modules/quiz";
 import CreateQuiz from "./components/CreateQuiz.vue";
+
+const selectedCategoryId = computed(() => {
+  return quizStore.categories.findIndex((el) => { return el.name == quizStore.selectedCategory })
+})
 
 const quizStore = useQuiz();
 

@@ -28,6 +28,9 @@
 import { computed, reactive, ref } from "vue"
 import { useQuiz } from "@/store/modules/quiz";
 import apiRoutes from "../composables/useApiRoutes";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 const inputGroupClass = ref("flex flex-column gap-2")
 
@@ -46,8 +49,15 @@ const quiz = reactive({
     owner_id: 1,
 })
 const createQuiz = async () => {
-    return await apiRoutes.quiz.createQuiz(quiz)
+    try {
+        const res = await apiRoutes.quiz.createQuiz(quiz)
+    } catch(err) {
+        show(err)
+    }
 }
+const show = (type = 'info', title = 'Alert', message = '') => {
+    toast.add({ severity: type, summary: title, detail: message, life: 3000 });
+};
 
 </script>
 
