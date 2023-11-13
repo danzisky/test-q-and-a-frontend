@@ -1,6 +1,6 @@
 <template>
   <div class="w-full margin-auto">
-    <form @submit.prevent="createQuiz">
+    <form class="w-full" @submit.prevent="createQuiz">
         <div class="flex flex-column gap-4 w-max">
             <div :class="inputGroupClass">
                 <label for="title">Title</label>
@@ -27,6 +27,7 @@
 <script setup>
 import { computed, reactive, ref } from "vue"
 import { useQuiz } from "@/store/modules/quiz";
+import { useAuth } from "@/store/modules/auth";
 import apiRoutes from "../composables/useApiRoutes";
 import { useToast } from "primevue/usetoast";
 
@@ -35,6 +36,7 @@ const toast = useToast();
 const inputGroupClass = ref("flex flex-column gap-2")
 
 const quizStore = useQuiz();
+const authStore = useAuth();
 const categories = computed(() => {
     return quizStore.categories ?? []
 })
@@ -46,11 +48,13 @@ const quiz = reactive({
     description: null,
     difficulty: null,
     category_id: null,
-    owner_id: 1,
 })
 const createQuiz = async () => {
     try {
-        const res = await apiRoutes.quiz.createQuiz(quiz)
+        const res = await apiRoutes.quiz.createQuiz({
+            ...quiz,
+            owner_id: authStore.user?.id,
+        })
     } catch(err) {
         show(err)
     }

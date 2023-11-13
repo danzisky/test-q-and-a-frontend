@@ -3,6 +3,9 @@
     <Toast/>
     <div class="h-screen w-screen">
       <div>
+        <Dropdown placeholder="Select a user" :options="quizStore.users" optionLabel="username" v-model="activeUser"></Dropdown>
+      </div>
+      <div>
         <SelectDifficulty v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" />
         <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="mt-6">
           <SelectCategories/>
@@ -18,9 +21,9 @@
         </div>
       </div>
 
-      <div>
-        <div class="py-6 class w-full mx-auto">
-          <CreateQuiz/>
+      <div v-if="authStore.user">
+        <div class="py-6 class w-full">
+          <CreateQuiz class="w-1/2 mx-auto"/>
         </div>
       </div>
     </div>
@@ -33,7 +36,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import SelectCategories from "@/components/SelectCategories.vue";
 import SelectDifficulty from "@/components/SelectDifficulty.vue";
 import SelectQuiz from "./components/SelectQuiz.vue";
@@ -42,13 +45,23 @@ import QuizApi from "@/api/quiz";
 const quizApi = new QuizApi();
 
 import { useQuiz } from "@/store/modules/quiz";
+import { useAuth } from "@/store/modules/auth";
 import CreateQuiz from "./components/CreateQuiz.vue";
-
+const activeUser = ref(null)
 const selectedCategoryId = computed(() => {
   return quizStore.categories.findIndex((el) => { return el.name == quizStore.selectedCategory })
 })
 
 const quizStore = useQuiz();
+const authStore = useAuth();
+
+const setUser = (user) => {
+  authStore.setUser(user)
+}
+
+watch(activeUser, () => {
+  authStore.setUser(activeUser.value)
+})
 
 const startQuiz = () => {
   quizStore.setQuizStatus("STARTED");
