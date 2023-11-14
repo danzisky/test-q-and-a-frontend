@@ -1,11 +1,11 @@
 <template>
   <div>
+    <Tag severity="warning" value="Warning" class="text-2xl">{{ timerCount }} seconds remaining</Tag>
     <div v-if="quizStore.quizStatus !== 'FINISHED'">
       <h1 class="text-center">Quiz</h1>
       <p class="text-center" v-if="currentQuestionIndex < questions.length">
         {{ currentQuestionIndex + 1 }} / {{ questions.length }}
       </p>
-
       <div
         v-for="(question, index) in questions"
         :key="index"
@@ -14,7 +14,9 @@
           v-if="index == currentQuestionIndex"
           :question="question"
           :choices="question.choices"
-          :onAnswer="handleAnswer"
+          @answer="handleAnswer"
+          v-model="answers[index]"
+
         />
       </div>
       <div class="py-4 text-center">
@@ -47,104 +49,77 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick, watch } from "vue";
 import ViewQuestion from "./ViewQuestion.vue";
 import { useQuiz } from "@/store/modules/quiz";
+import { useAuth } from "@/store/modules/auth";
+import apiRoutes from "../composables/useApiRoutes";
+import { useToast } from "primevue/usetoast";
 
+const toast = useToast()
 const quizStore = useQuiz();
+const authStore = useAuth();
 const questions = quizStore.selectedQuiz.questions;
-
-// const questions = ref([
-//   {
-//     question: "What is the capital of France?",
-//     choices: [
-//       { name: "Accounting", key: "A" },
-//       { name: "Marketing", key: "M" },
-//       { name: "Production", key: "P" },
-//       { name: "Research", key: "R" },
-//     ],
-//     correctAnswer: "Paris",
-//   },
-//   {
-//     question: "What is the capital of Spain?",
-//     choices: [
-//       { name: "Accounting", key: "A" },
-//       { name: "Marketing", key: "M" },
-//       { name: "Production", key: "P" },
-//       { name: "Research", key: "R" },
-//     ],
-//     correctAnswer: "Madrid",
-//   },
-//   {
-//     question: "What is the capital of Germany?",
-//     choices: [
-//       { name: "Accounting", key: "A" },
-//       { name: "Marketing", key: "M" },
-//       { name: "Production", key: "P" },
-//       { name: "Research", key: "R" },
-//     ],
-//     correctAnswer: "Berlin",
-//   },
-//   {
-//     question: "What is the capital of Italy?",
-//     choices: [
-//       { name: "Accounting", key: "A" },
-//       { name: "Marketing", key: "M" },
-//       { name: "Production", key: "P" },
-//       { name: "Research", key: "R" },
-//     ],
-//     correctAnswer: "Rome",
-//   },
-//   {
-//     question: "What is the capital of Portugal?",
-//     choices: [
-//       { name: "Accounting", key: "A" },
-//       { name: "Marketing", key: "M" },
-//       { name: "Production", key: "P" },
-//       { name: "Research", key: "R" },
-//     ],
-//     correctAnswer: "Lisbon",
-//   },
-//   {
-//     question: "What is the capital of Poland?",
-//     choices: [
-//       { name: "Accounting", key: "A" },
-//       { name: "Marketing", key: "M" },
-//       { name: "Production", key: "P" },
-//       { name: "Research", key: "R" },
-//     ],
-//     correctAnswer: "Warsaw",
-//   },
-//   {
-//     question: "What is the capital of Sweden?",
-//     choices: [
-//       { name: "Accounting", key: "A" },
-//       { name: "Marketing", key: "M" },
-//       { name: "Production", key: "P" },
-//       { name: "Research", key: "R" },
-//     ],
-//     correctAnswer: "Stockholm",
-//   },
-// ]);
+const answers = ref([]);
 
 const currentQuestionIndex = ref(0);
 const score = ref(0);
+const timerCount = ref(60);
 
 const handleAnswer = (isCorrect) => {
   if (isCorrect) {
     score.value++;
   }
 
-  if (currentQuestionIndex.value < questions.length - 1) {
+  /* if (currentQuestionIndex.value < questions.length - 1) {
     currentQuestionIndex.value++;
-  }
+  } */
 };
 
 const finishQuiz = () => {
+  storeResults()
   quizStore.setQuizStatus("FINISHED");
 };
-
+const storeResults = async () => {
+  try {
+    const res = await apiRoutes.quiz.createResult({
+      score: score.value,
+      time_taken : 60 - (timerCount.value ?? 0),
+      quiz_id: quizStore.selectedQuiz?.id,
+      user_id: authStore.user?.id
+    })
+    show('info', 'Results Saved!', 'Your result has been saved successfully')
+  } catch (err) {
+    show('error', 'Error!', err)
+  }
+}
+const show = (type = 'info', title = 'Alert', message = '') => {
+  toast.add({ severity: type, summary: title, detail: message, life: 3000 });
+};
 const backToQuizSelection = () => {
   quizStore.setQuizStatus("NOT_STARTED");
 };
+async function minusOne() {
+  timerCount.value--
+  // await nextTick()
+  if(timerCount.value > 1) {
+    setTimeout(() => {
+      minusOne()
+    }, 1000);
+  } else {
+    timerCount.value = 0
+    finishQuiz()
+    setTimeout(() => {
+      alert('Time Up!!')
+    }, 200);
+  }
+}
+onMounted(() => {
+  minusOne()
+})
+/* watch(timerCount, ) {
+  if(timerCount.value < 1) {
+    finishQuiz()
+  }
+} */
 </script>

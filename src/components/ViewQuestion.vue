@@ -17,11 +17,14 @@
 
 <script setup>
 import { reactive, watch } from "vue";
-const emit = defineEmits(['answer'])
+const emit = defineEmits(['answer','update:modelValue'])
 const props = defineProps({
   question: {
     type: Object,
     required: true,
+  },
+  modelValue: {
+    default: null,
   },
   choices: {
     type: String,
@@ -34,10 +37,11 @@ const props = defineProps({
 });
 
 const state = reactive({
-  selectedChoice: null,
+  selectedChoice: props?.modelValue ?? null,
 });
 
 watch(state, () => {
+  emit('update:modelValue', state.selectedChoice)
   emit('answer', state.selectedChoice === props.question?.correct_answer)
 })
 
