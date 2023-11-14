@@ -26,9 +26,12 @@
                 <div class="py-6 class w-full">
                     <router-link to="/quiz/create">Create New Quiz</router-link>
                 </div>
+                <div class="py-6 class w-full">
+                    <router-link to="/quiz/results">View Results</router-link>
+                </div>
             </div>
         </div>
-
+        <!-- <ViewResults :user="authStore.user"/> -->
         <div class="footer">
             <div class="footer-content">
             </div>
@@ -43,6 +46,7 @@ import SelectDifficulty from "@/components/SelectDifficulty.vue";
 import SelectQuiz from "./components/SelectQuiz.vue";
 import Quiz from "@/components/Quiz.vue";
 import QuizApi from "@/api/quiz";
+
 const quizApi = new QuizApi();
 
 import { useQuiz } from "@/store/modules/quiz";

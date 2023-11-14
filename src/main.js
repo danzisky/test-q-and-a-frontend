@@ -110,11 +110,18 @@ import { createPinia } from "pinia";
 
 import CreateQuiz from '@/components/CreateQuiz.vue'
 import Index from '@/Index.vue'
+import ViewResults from '@/components/ViewResults.vue'
 const routes = [
     {
         path: '/quiz/create',
         name: 'quiz.create',
         component: CreateQuiz,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/quiz/results',
+        name: 'quiz.create',
+        component: ViewResults,
         meta: { requiresAuth: true },
     },
     {
