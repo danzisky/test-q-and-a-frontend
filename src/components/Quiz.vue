@@ -1,49 +1,54 @@
 <template>
   <div>
     <Tag severity="warning" value="Warning" class="text-2xl">{{ timerCount }} seconds remaining</Tag>
-    <div v-if="quizStore.quizStatus !== 'FINISHED'">
-      <h1 class="text-center">Quiz</h1>
-      <p class="text-center" v-if="currentQuestionIndex < questions.length">
-        {{ currentQuestionIndex + 1 }} / {{ questions.length }}
-      </p>
-      <div
-        v-for="(question, index) in questions"
-        :key="index"
-      >
-        <ViewQuestion
-          v-if="index == currentQuestionIndex"
-          :question="question"
-          :choices="question.choices"
-          @answer="handleAnswer"
-          v-model="answers[index]"
-
-        />
+    <div v-if="!authStore.user" class="text-center">
+      Please select a user
+    </div>
+    <div v-else>
+      <div v-if="quizStore.quizStatus !== 'FINISHED'">
+        <h1 class="text-center">Quiz</h1>
+        <p class="text-center" v-if="currentQuestionIndex < questions.length">
+          {{ currentQuestionIndex + 1 }} / {{ questions.length }}
+        </p>
+        <div
+          v-for="(question, index) in questions"
+          :key="index"
+        >
+          <ViewQuestion
+            v-if="index == currentQuestionIndex"
+            :question="question"
+            :choices="question.choices"
+            @answer="handleAnswer"
+            v-model="answers[index]"
+  
+          />
+        </div>
+        <div class="py-4 text-center">
+          <Button v-if="(currentQuestionIndex+1) > 1" @click="currentQuestionIndex--">Previous</Button>
+          <Button v-if="((currentQuestionIndex + 1) > 0) && ((currentQuestionIndex + 1) < questions.length)" @click="currentQuestionIndex++" class="ml-2">Next</Button>
+        </div>
+        <div  class="text-center mt-6">
+          <Button
+            @click="finishQuiz"
+            class="text-2xl"
+            raised
+            text
+            label="Finish!"
+          ></Button>
+        </div>
       </div>
-      <div class="py-4 text-center">
-        <Button v-if="(currentQuestionIndex+1) > 1" @click="currentQuestionIndex--">Previous</Button>
-        <Button v-if="((currentQuestionIndex + 1) > 0) && ((currentQuestionIndex + 1) < questions.length)" @click="currentQuestionIndex++" class="ml-2">Next</Button>
-      </div>
-      <div  class="text-center mt-6">
+  
+      <div v-if="quizStore.quizStatus === 'FINISHED'" class="text-center">
+        <h2>Quiz Completed!</h2>
+        <p>Your Score: {{ score }} / {{ questions.length }}</p>
         <Button
-          @click="finishQuiz"
+          @click="backToQuizSelection"
           class="text-2xl"
           raised
           text
-          label="Finish!"
+          label="Back to Quiz Selection"
         ></Button>
       </div>
-    </div>
-
-    <div v-if="quizStore.quizStatus === 'FINISHED'" class="text-center">
-      <h2>Quiz Completed!</h2>
-      <p>Your Score: {{ score }} / {{ questions.length }}</p>
-      <Button
-        @click="backToQuizSelection"
-        class="text-2xl"
-        raised
-        text
-        label="Back to Quiz Selection"
-      ></Button>
     </div>
   </div>
 </template>
@@ -84,7 +89,7 @@ const storeResults = async () => {
   try {
     const res = await apiRoutes.quiz.createResult({
       score: score.value,
-      time_taken : 60 - (timerCount.value ?? 0),
+      time_taken : String(60 - (timerCount.value ?? 0)),
       quiz_id: quizStore.selectedQuiz?.id,
       user_id: authStore.user?.id
     })
@@ -102,13 +107,16 @@ const backToQuizSelection = () => {
 async function minusOne() {
   timerCount.value--
   // await nextTick()
+  if (quizStore.quizStatus === 'FINISHED') {
+    return
+  }
   if(timerCount.value > 1) {
     setTimeout(() => {
       minusOne()
     }, 1000);
   } else {
-    timerCount.value = 0
     finishQuiz()
+    timerCount.value = 0
     setTimeout(() => {
       alert('Time Up!!')
     }, 200);
