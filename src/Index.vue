@@ -29,6 +29,10 @@
                 <div class="py-6 class w-full">
                     <router-link to="/quiz/results">View Results</router-link>
                 </div>
+                <Button @click="generateQuiz">Generate Quiz</Button>
+                <div class="py-2" v-if="generatedQuiz">
+                    {{ generatedQuiz }}
+                </div>
             </div>
         </div>
         <!-- <ViewResults :user="authStore.user"/> -->
@@ -46,27 +50,37 @@ import SelectDifficulty from "@/components/SelectDifficulty.vue";
 import SelectQuiz from "./components/SelectQuiz.vue";
 import Quiz from "@/components/Quiz.vue";
 import QuizApi from "@/api/quiz";
-
-const quizApi = new QuizApi();
-
+import { useToast } from "primevue/usetoast";
 import { useQuiz } from "@/store/modules/quiz";
 import { useAuth } from "@/store/modules/auth";
+import axios from "axios";
 
+const toast = useToast()
+const quizApi = new QuizApi();
 const selectedCategoryId = computed(() => {
     return quizStore.categories.findIndex((el) => { return el.name == quizStore.selectedCategory })
 })
 
 const quizStore = useQuiz();
 const authStore = useAuth();
-
-
-
-
+const generatedQuiz = ref({})
 
 const startQuiz = () => {
     quizStore.setQuizStatus("STARTED");
 };
 
+const generateQuiz = async () => {
+    try {
+        const res = await axios.post(`http://localhost:8001/v1/quiz/generate_quiz/2`,{})
+        generatedQuiz.value = res
+        
+    } catch (error) {
+        show('error', 'Error!', error);
+    }
+}
+const show = (type = 'info', title = 'Alert', message = '') => {
+    toast.add({ severity: type, summary: title, detail: message, life: 3000 });
+};
 /* onMounted(async () => {
     const quizzesResponse = await quizApi.getAllQuizzes();
     const usersResponse = await quizApi.getAllUsers();
