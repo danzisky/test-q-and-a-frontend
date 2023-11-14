@@ -1,81 +1,49 @@
 <template>
-  <div class="p-2 sm:p-6">
-    <Toast/>
-    <div class="h-screen w-screen">
-      <div>
-        <Dropdown placeholder="Select a user" :options="quizStore.users" optionLabel="username" v-model="activeUser"></Dropdown>
-      </div>
-      <div>
-        <SelectDifficulty v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" />
-        <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="mt-6">
-          <SelectCategories/>
+    <div class="">
+        <Toast />
+        <div class="w-full h-full py-4">
+          <div class="p-2 sm:px-4">
+            <Button @click="$router.go(-1)">Back</Button>
+          </div>
+            <div class="p-s sm:px-4">
+                <Dropdown placeholder="Select a user" :options="quizStore.users" optionLabel="username"
+                    v-model="activeUser"></Dropdown>
+            </div>
+            <router-view></router-view>
         </div>
-        <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED' && quizStore.selectedCategory" class="mt-6">
-          <SelectQuiz :category-id="selectedCategoryId" />
-        </div>
-        <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'" class="text-center mt-6">
-          <Button @click="startQuiz" raised text label="Start!"></Button>
-        </div>
-        <div v-if="quizStore.quizStatus === 'STARTED' || quizStore.quizStatus === 'FINISHED'" class="mt-6">
-          <Quiz />
-        </div>
-      </div>
-
-      <div v-if="authStore.user">
-        <div class="py-6 class w-full">
-          <CreateQuiz class="w-1/2 mx-auto"/>
-        </div>
-      </div>
     </div>
-
-    <div class="footer">
-      <div class="footer-content">
-      </div>
-    </div>
-  </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
-import SelectCategories from "@/components/SelectCategories.vue";
-import SelectDifficulty from "@/components/SelectDifficulty.vue";
-import SelectQuiz from "./components/SelectQuiz.vue";
-import Quiz from "@/components/Quiz.vue";
+import { onMounted, onUpdated, ref, watch } from "vue";
 import QuizApi from "@/api/quiz";
-const quizApi = new QuizApi();
-
 import { useQuiz } from "@/store/modules/quiz";
 import { useAuth } from "@/store/modules/auth";
-import CreateQuiz from "./components/CreateQuiz.vue";
-const activeUser = ref(null)
-const selectedCategoryId = computed(() => {
-  return quizStore.categories.findIndex((el) => { return el.name == quizStore.selectedCategory })
-})
-
+const quizApi = new QuizApi();
 const quizStore = useQuiz();
 const authStore = useAuth();
-
+const activeUser = ref(null)
 const setUser = (user) => {
   authStore.setUser(user)
 }
-
 watch(activeUser, () => {
   authStore.setUser(activeUser.value)
 })
-
-const startQuiz = () => {
-  quizStore.setQuizStatus("STARTED");
-};
-
-onMounted(async () => {
+async function runInit() {
   const quizzesResponse = await quizApi.getAllQuizzes();
   const usersResponse = await quizApi.getAllUsers();
 
-  const categories = quizzesResponse.data.value.map((quiz) => quiz.category);
+  let categories = quizzesResponse.data.value.map((quiz) => quiz.category);
+  let uniqueCategories =  [...new Map(categories.map(obj => [obj.name, obj])).values()]
 
+  console.log(uniqueCategories);
   quizStore.setQuizzes(quizzesResponse.data.value);
-  quizStore.setCategories(categories);
+  quizStore.setCategories(uniqueCategories);
   quizStore.setUsers(usersResponse.data.value)
+}
+
+onMounted(() => {
+  runInit()
 });
 </script>
 
@@ -133,7 +101,7 @@ a {
   font-size: 1rem;
 }
 
-.hero-section .hero-content span > a {
+.hero-section .hero-content span>a {
   font-size: 1rem;
   opacity: 0.98;
   color: #41b883;
@@ -142,7 +110,7 @@ a {
   transition: opacity 0.2s;
 }
 
-.hero-section .hero-content span > a:hover {
+.hero-section .hero-content span>a:hover {
   opacity: 0.78;
 }
 
@@ -171,12 +139,10 @@ a {
 
 .grid-section .card::after {
   content: "";
-  background: linear-gradient(
-    -145deg,
-    rgba(255, 255, 255, 0) 32.91%,
-    #fff 54.61%,
-    rgba(255, 255, 255, 0) 74.56%
-  );
+  background: linear-gradient(-145deg,
+      rgba(255, 255, 255, 0) 32.91%,
+      #fff 54.61%,
+      rgba(255, 255, 255, 0) 74.56%);
   border-radius: 20px;
   position: absolute;
   top: -2px;
@@ -251,11 +217,9 @@ a {
 
 .grid-section .card.forms .form-wrapper .form-input {
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: linear-gradient(
-      0deg,
+  background: linear-gradient(0deg,
       rgba(255, 255, 255, 0.03) 0%,
-      rgba(255, 255, 255, 0.03) 100%
-    ),
+      rgba(255, 255, 255, 0.03) 100%),
     #2a2d31;
   transition: all 0.2s;
   width: 100%;
@@ -312,12 +276,10 @@ a {
 .grid-section .card.discussions a img,
 .card.primeland a img {
   height: 32px;
-  -webkit-mask-image: linear-gradient(
-    87deg,
-    rgba(255, 255, 255, 0.7) 30%,
-    #fff 50%,
-    rgba(255, 255, 255, 0.7) 70%
-  );
+  -webkit-mask-image: linear-gradient(87deg,
+      rgba(255, 255, 255, 0.7) 30%,
+      #fff 50%,
+      rgba(255, 255, 255, 0.7) 70%);
   -webkit-mask-size: 200%;
 }
 
@@ -349,11 +311,9 @@ a {
   width: 174px;
   height: 174px;
   flex-shrink: 0;
-  fill: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.4) -234.2%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  fill: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.4) -234.2%,
+      rgba(255, 255, 255, 0) 100%);
   mix-blend-mode: color-dodge;
 }
 

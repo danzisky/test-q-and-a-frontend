@@ -105,11 +105,42 @@ import TreeTable from 'primevue/treetable';
 import TriStateCheckbox from 'primevue/tristatecheckbox';
 import VirtualScroller from 'primevue/virtualscroller';
 import Tailwind from 'primevue/passthrough/tailwind';
-
+import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from "pinia";
+
+import CreateQuiz from '@/components/CreateQuiz.vue'
+import Index from '@/Index.vue'
+const routes = [
+    {
+        path: '/quiz/create',
+        name: 'quiz.create',
+        component: CreateQuiz,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/quiz/:id',
+        name: 'quiz.show',
+        component: CreateQuiz,
+        props: true,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/',
+        name: 'index',
+        component: Index,
+        meta: { requiresAuth: true }, // Add meta field to indicate authentication is required
+    },
+    // Other routes...
+];
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+});
 
 const app = createApp(App).use(createPinia())
 
+app.use(router)
 
 app.use(PrimeVue, { ripple: true});
 app.use(ConfirmationService);
