@@ -7,24 +7,24 @@
   >
     <RadioButton
       v-model="state.selectedChoice"
-      :inputId="index"
+      :inputId="`rad-${index}`"
       name="dynamic"
       :value="choice"
     />
-    <label :for="index" class="ml-2 text-xl text-center">{{ choice }}</label>
+    <label :for="`rad-${index}`" class="ml-2 text-xl text-center">{{ choice }}</label>
   </div>
 </template>
 
 <script setup>
-import { reactive } from "vue";
-
+import { reactive, watch } from "vue";
+const emit = defineEmits(['answer'])
 const props = defineProps({
   question: {
-    type: String,
+    type: Object,
     required: true,
   },
   choices: {
-    type: Array,
+    type: String,
     required: true,
   },
   onAnswer: {
@@ -36,5 +36,9 @@ const props = defineProps({
 const state = reactive({
   selectedChoice: null,
 });
+
+watch(state, () => {
+  emit('answer', state.selectedChoice === props.question?.correct_answer)
+})
 
 </script>

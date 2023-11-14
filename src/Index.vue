@@ -14,7 +14,6 @@
                 <div v-if="quizStore.quizStatus !== 'STARTED' && quizStore.quizStatus !== 'FINISHED'"
                     class="text-center mt-6">
                     <Button @click="startQuiz" raised text label="Start!"></Button>
-                    <!-- {{ quizStore.selectedQuiz }} -->
                     <Button v-if="quizStore.selectedQuiz && (quizStore.selectedQuiz?.owner?.id === authStore.user?.id)"
                         @click="$router.push(`/quiz/${quizStore.selectedQuiz?.id}`)" raised text label="Modify Questions"></Button>
                 </div>

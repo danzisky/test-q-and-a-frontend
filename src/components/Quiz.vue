@@ -6,13 +6,21 @@
         {{ currentQuestionIndex + 1 }} / {{ questions.length }}
       </p>
 
-      <ViewQuestion
+      <div
         v-for="(question, index) in questions"
-        :question="question"
-        :choices="question.choices"
-        :onAnswer="handleAnswer"
-      />
-
+        :key="index"
+      >
+        <ViewQuestion
+          v-if="index == currentQuestionIndex"
+          :question="question"
+          :choices="question.choices"
+          :onAnswer="handleAnswer"
+        />
+      </div>
+      <div class="py-4 text-center">
+        <Button v-if="(currentQuestionIndex+1) > 1" @click="currentQuestionIndex--">Previous</Button>
+        <Button v-if="((currentQuestionIndex + 1) > 0) && ((currentQuestionIndex + 1) < questions.length)" @click="currentQuestionIndex++" class="ml-2">Next</Button>
+      </div>
       <div  class="text-center mt-6">
         <Button
           @click="finishQuiz"
@@ -119,7 +127,7 @@ const questions = quizStore.selectedQuiz.questions;
 //   },
 // ]);
 
-const currentQuestionIndex = 0;
+const currentQuestionIndex = ref(0);
 const score = ref(0);
 
 const handleAnswer = (isCorrect) => {
