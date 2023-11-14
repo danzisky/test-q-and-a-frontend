@@ -1,5 +1,5 @@
 <template>
-  <div class="py-6 w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round">
+  <div class="p-2 sm:p-4 mx-auto border-round">
     <form class="w-full" @submit.prevent="createQuiz">
         <div class="flex flex-column gap-4 w-max">
             <div :class="inputGroupClass">
@@ -21,9 +21,14 @@
             <Button type="submit" label="Submit" />
         </div>
     </form>
-    <div v-if="quiz?.id" class="py-6" >
-        <div v-for="(question, index) in questions" :key="index">
-            <AddQuestion :quiz="quiz" :question="question"/>
+    <div v-if="quiz?.id && authStore.user" class="py-6" >
+        <div>
+            <Button @click="newQuestion">Add Question</Button>
+        </div>
+        <div class="py-4 flex flex-wrap gap-2">
+            <div class="p-4 bg-gray-500 bg-opacity-10" v-for="(question, index) in questions" :key="index">
+                <AddQuestion :quiz="quiz" :question="question"/>
+            </div>
         </div>
     </div>
   </div>
@@ -93,6 +98,8 @@ const setData = (data) => {
     quizData.description = data?.description ?? null;
     quizData.difficulty = data?.difficulty ?? null;
     quizData.category_id = data?.category?.id ?? null;
+
+    questions.value = data?.questions ?? []
 }
 const createQuiz = async () => {
     try {
